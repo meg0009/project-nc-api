@@ -1,6 +1,7 @@
 package com.chivapchichi.controller.rest;
 
 import com.chivapchichi.model.UserAndMember;
+import com.chivapchichi.service.MailService;
 import com.chivapchichi.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -18,10 +19,12 @@ import java.util.Map;
 public class RegistrationRestController {
 
     private final UsersService usersService;
+    private final MailService mailService;
 
     @Autowired
-    public RegistrationRestController(UsersService usersService) {
+    public RegistrationRestController(UsersService usersService, MailService mailService) {
         this.usersService = usersService;
+        this.mailService = mailService;
     }
 
     @PostMapping
@@ -30,6 +33,7 @@ public class RegistrationRestController {
         if (!result.hasErrors()) {
          if (usersService.addNewUserWithMember(user.getUsers(), user.getMembers())) {
              res.put("result", "added");
+             mailService.siteRegistration(user.getUsers().getUserName());
          } else {
              res.put("result", "user exists");
          }

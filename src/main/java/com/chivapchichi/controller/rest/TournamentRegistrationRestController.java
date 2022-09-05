@@ -3,6 +3,7 @@ package com.chivapchichi.controller.rest;
 import com.chivapchichi.model.Tournament;
 import com.chivapchichi.repository.RecordRepository;
 import com.chivapchichi.repository.TournamentRepository;
+import com.chivapchichi.service.MailService;
 import com.chivapchichi.service.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,10 +17,12 @@ import java.util.*;
 public class TournamentRegistrationRestController {
 
     private final TournamentService tournamentService;
+    private final MailService mailService;
 
     @Autowired
-    public TournamentRegistrationRestController(TournamentService tournamentService) {
+    public TournamentRegistrationRestController(TournamentService tournamentService, MailService mailService) {
         this.tournamentService = tournamentService;
+        this.mailService = mailService;
     }
 
     @GetMapping("/get-dates")
@@ -57,6 +60,7 @@ public class TournamentRegistrationRestController {
         Map<String, String> res = new HashMap<>();
         if (reg) {
             res.put("registered", "now");
+            mailService.tournamentRegistration(currentPrincipal, tournamentService.getTournamentById(id).toString());
         } else {
             res.put("registered", "already");
         }
@@ -73,6 +77,7 @@ public class TournamentRegistrationRestController {
         Map<String, String> res = new HashMap<>();
         if (unreg) {
             res.put("unregistered", "now");
+            mailService.tournamentUnregistration(currentPrincipal, tournamentService.getTournamentById(id).toString());
         } else {
             res.put("unregistered", "already");
         }
